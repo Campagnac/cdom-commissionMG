@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Commission de reprise d'activité de médecine générale</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #d8e3eb;
+            color: #334e68;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- HEADER -->
+    <header class="bg-[#486581] text-white shadow-md py-4 px-6 flex justify-between items-center">
+        <h1 class="text-base md:text-xl font-bold tracking-wide">Commission de reprise d'activité de médecine générale</h1>
+        <div id="user-info" class="hidden flex items-center gap-4">
+            <span id="welcome-msg" class="text-sm font-medium"></span>
+            <button onclick="logout()" class="bg-[#243b53] hover:bg-[#102a43] text-white px-3 py-1.5 rounded-lg text-sm transition shadow-sm">Déconnexion</button>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto p-4 md:p-6 flex-grow w-full">
+
+        <!-- VUE 1 : SÉLECTION DU MODE DE CONNEXION -->
+        <section id="view-login" class="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-6 md:p-8 max-w-md mx-auto mt-8 border border-[#bcccdc]">
+            <!-- Logo CDOM Agrandis -->
+            <div class="flex justify-center mb-6">
+                <img src="logo-cdom.jpg" alt="Logo Ordre des Médecins - Conseil Départemental de l'Hérault" class="max-h-40 w-auto object-contain rounded-lg">
+            </div>
+
+            <h2 class="text-xl font-bold mb-6 text-center text-[#243b53]">Connexion à l'Agenda</h2>
+            
+            <div class="space-y-6">
+                <!-- Bloc Utilisateur -->
+                <div class="border border-[#bcccdc] p-4 rounded-xl bg-[#f0f4f8]">
+                    <h3 class="font-semibold mb-2 text-[#243b53]">Espace Utilisateur</h3>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <input type="text" id="user-firstname" placeholder="Prénom" class="w-full border border-[#bcccdc] rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#486581]">
+                        <input type="text" id="user-lastname" placeholder="Nom" class="w-full border border-[#bcccdc] rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-[#486581]">
+                    </div>
+                    <button onclick="loginAsUser()" class="w-full bg-[#486581] hover:bg-[#334e68] text-white font-medium py-2 rounded-lg transition shadow">Accéder en tant d'Utilisateur</button>
+                </div>
+
+                <!-- Bloc Administrateur -->
+                <div class="border border-[#bcccdc] p-4 rounded-xl bg-[#f0f4f8]">
+                    <h3 class="font-semibold mb-2 text-[#243b53]">Espace Administrateur</h3>
+                    <input type="password" id="admin-pass-input" placeholder="Mot de passe admin" class="w-full border border-[#bcccdc] rounded-lg px-3 py-2 mb-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#486581]">
+                    <button onclick="loginAsAdmin()" class="w-full bg-[#243b53] hover:bg-[#102a43] text-white font-medium py-2 rounded-lg transition shadow">Accéder en tant d'Admin</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- VUE 2 : ESPACE ADMINISTRATEUR -->
+        <section id="view-admin" class="hidden space-y-6">
+            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-6 border border-[#bcccdc]">
+                <h2 class="text-xl font-bold mb-4 text-[#243b53]">Ajouter un créneau de 2 heures</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-[#486581]">Date</label>
+                        <input type="date" id="admin-date" class="w-full border border-[#bcccdc] rounded-lg px-3 py-2 bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1 text-[#486581]">Heure de début</label>
+                        <input type="time" id="admin-time" class="w-full border border-[#bcccdc] rounded-lg px-3 py-2 bg-white">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="addSlot()" class="w-full bg-[#486581] hover:bg-[#334e68] text-white font-medium py-2 rounded-lg transition shadow">Créer le créneau</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions Globales Administrateur -->
+            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-6 border border-[#bcccdc] flex flex-wrap gap-4 justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold text-[#243b53]">Actions globales de l'agenda</h3>
+                    <p class="text-sm text-[#627d98]">Gérez l'ensemble des réservations ou nettoyez l'agenda complet.</p>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    <button onclick="resetAllReservations()" class="bg-yellow-500 hover:bg-yellow-600 text-white font-medium px-4 py-2 rounded-lg transition shadow-sm text-sm">Réinitialiser toutes les réservations</button>
+                    <button onclick="resetEntireAgenda()" class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-4 py-2 rounded-lg transition shadow-sm text-sm">Réinitialiser l'agenda[cite: 1]</button>
+                </div>
+            </div>
+
+            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-6 border border-[#bcccdc]">
+                <h2 class="text-xl font-bold mb-4 text-[#243b53]">Liste des créneaux gérés</h2>
+                <div id="admin-slots-list" class="space-y-3">
+                    <!-- Généré dynamiquement -->
+                </div>
+            </div>
+        </section>
+
+        <!-- VUE 3 : ESPACE UTILISATEUR -->
+        <section id="view-user" class="hidden space-y-6">
+            <div class="bg-white/90 backdrop-blur rounded-2xl shadow-xl p-6 border border-[#bcccdc]">
+                <h2 class="text-xl font-bold mb-2 text-[#243b53]">Créneaux disponibles</h2>
+                <p class="text-sm text-[#627d98] mb-6">Réservez un créneau directement ou positionnez-vous en "Disponible si besoin". Si un créneau est en "Disponible si besoin", vous pouvez le reprendre.</p>
+                <div id="user-slots-list" class="space-y-3">
+                    <!-- Généré dynamiquement -->
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FIREBASE SDK (Version Compat pour intégration simple en script HTML classique) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-analytics-compat.js"></script>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // Configuration Firebase fournie
+        const firebaseConfig = {
+            apiKey: "AIzaSyAFqdyvtr_MW5vJ7cAz0fcWiBTmMaZxB1E",
+            authDomain: "cdom-commission-mg.firebaseapp.com",
+            databaseURL: "https://cdom-commission-mg-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "cdom-commission-mg",
+            storageBucket: "cdom-commission-mg.firebasestorage.app",
+            messagingSenderId: "505121727200",
+            appId: "1:505121727200:web:6f2ee4a9c41bc090de6685",
+            measurementId: "G-B0C7JX8P6J"
+        };
+
+        // Initialisation de Firebase
+        firebase.initializeApp(firebaseConfig);
+        try {
+            firebase.analytics();
+        } catch (e) {
+            console.log("Analytics non disponible (bloqueur de pub potentiel)");
+        }
+        
+        const db = firebase.database();
+
+        const ADMIN_CODE = "Admin@2026";
+        let currentUser = null;
+        let userRole = null;
+        let cachedSlots = [];
+
+        // Fonction pour formater la date au format "mardi 25 août 2026"
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const dateObj = new Date(dateString + 'T00:00:00');
+            if (isNaN(dateObj)) return dateString;
+            
+            const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+            let formatted = dateObj.toLocaleDateString('fr-FR', options);
+            return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+        }
+
+        // Écoute en temps réel des modifications sur Firebase
+        db.ref('slots').on('value', (snapshot) => {
+            const data = snapshot.val();
+            cachedSlots = [];
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    cachedSlots.push({ id: key, ...data[key] });
+                });
+            }
+
+            // Tri chronologique des créneaux (par date puis par heure de début)
+            cachedSlots.sort((a, b) => {
+                const dateA = new Date(`${a.date}T${a.time.split(' - ')[0]}:00`);
+                const dateB = new Date(`${b.date}T${b.time.split(' - ')[0]}:00`);
+                return dateA - dateB;
+            });
+
+            if (userRole === 'admin') {
+                renderAdminSlots();
+            } else if (userRole === 'user') {
+                renderUserSlots();
+            }
+        });
+
+        function loginAsAdmin() {
+            const pass = document.getElementById('admin-pass-input').value;
+            if (pass === ADMIN_CODE) {
+                userRole = 'admin';
+                currentUser = 'Administrateur';
+                document.getElementById('admin-pass-input').value = '';
+                showDashboard();
+            } else {
+                alert('Mot de passe incorrect.');
+            }
+        }
+
+        function loginAsUser() {
+            const firstname = document.getElementById('user-firstname').value.trim();
+            const lastname = document.getElementById('user-lastname').value.trim();
+            
+            if (!firstname || !lastname) {
+                alert('Veuillez entrer votre prénom et votre nom.');
+                return;
+            }
+            
+            userRole = 'user';
+            currentUser = `${firstname} ${lastname}`;
+            showDashboard();
+        }
+
+        function logout() {
+            currentUser = null;
+            userRole = null;
+            document.getElementById('user-firstname').value = '';
+            document.getElementById('user-lastname').value = '';
+            document.getElementById('user-info').classList.add('hidden');
+            
+            document.getElementById('view-admin').classList.add('hidden');
+            document.getElementById('view-user').classList.add('hidden');
+            document.getElementById('view-login').classList.remove('hidden');
+        }
+
+        function showDashboard() {
+            document.getElementById('view-login').classList.add('hidden');
+            document.getElementById('user-info').classList.remove('hidden');
+            document.getElementById('welcome-msg').innerText = `Connecté : ${currentUser} (${userRole === 'admin' ? 'Admin' : 'Médecin'})`;
+
+            if (userRole === 'admin') {
+                document.getElementById('view-admin').classList.remove('hidden');
+                renderAdminSlots();
+            } else {
+                document.getElementById('view-user').classList.remove('hidden');
+                renderUserSlots();
+            }
+        }
+
+        function addSlot() {
+            const date = document.getElementById('admin-date').value;
+            const time = document.getElementById('admin-time').value;
+
+            if (!date || !time) {
+                alert('Veuillez remplir la date et l\'heure de début.');
+                return;
+            }
+
+            const [hours, minutes] = time.split(':').map(Number);
+            const endHours = (hours + 2) % 24;
+            const endTime = `${String(endHours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+            const timeRange = `${time} - ${endTime}`;
+
+            db.ref('slots').push({
+                date: date,
+                time: timeRange,
+                status: 'libre',
+                user: null
+            });
+
+            document.getElementById('admin-date').value = '';
+            document.getElementById('admin-time').value = '';
+        }
+
+        function deleteSlot(id) {
+            db.ref('slots/' + id).remove();
+        }
+
+        function cancelSlotReservation(id) {
+            if (confirm("Voulez-vous vraiment annuler la réservation de ce créneau ?")) {
+                db.ref('slots/' + id).update({
+                    status: 'libre',
+                    user: null
+                });
+            }
+        }
+
+        function resetAllReservations() {
+            if (confirm("Êtes-vous sûr de vouloir réinitialiser toutes les réservations ? Tous les créneaux redeviendront libres.")) {
+                const updates = {};
+                cachedSlots.forEach(slot => {
+                    updates[`slots/${slot.id}/status`] = 'libre';
+                    updates[`slots/${slot.id}/user`] = null;
+                });
+                db.ref().update(updates);
+            }
+        }
+
+        function resetEntireAgenda() {
+            if (confirm("ATTENTION : Cette action va supprimer définitivement TOUS les créneaux de l'agenda[cite: 1]. Voulez-vous continuer ?")) {
+                db.ref('slots').remove();
+            }
+        }
+
+        function renderAdminSlots() {
+            const container = document.getElementById('admin-slots-list');
+            
+            if (cachedSlots.length === 0) {
+                container.innerHTML = `<p class="text-[#627d98] italic">Aucun créneau créé pour le moment.</p>`;
+                return;
+            }
+
+            container.innerHTML = cachedSlots.map(slot => {
+                let adminActionButtons = `<button onclick="deleteSlot('${slot.id}')" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-lg text-sm transition shadow-sm">Supprimer</button>`;
+                
+                if (slot.status !== 'libre') {
+                    adminActionButtons = `
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="cancelSlotReservation('${slot.id}')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded-lg text-sm transition shadow-sm">Annuler la réservation</button>
+                            <button onclick="deleteSlot('${slot.id}')" class="bg-rose-500 hover:bg-rose-600 text-white px-3 py-1.5 rounded-lg text-sm transition shadow-sm">Supprimer</button>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="border border-[#bcccdc] p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-[#f0f4f8]">
+                        <div>
+                            <span class="font-bold text-[#243b53]">${formatDate(slot.date)}</span> de <span class="text-[#486581] font-semibold">${slot.time}</span>
+                            <div class="text-sm mt-1">
+                                État : ${getStatusBadge(slot)}
+                            </div>
+                        </div>
+                        ${adminActionButtons}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function updateSlotStatus(id, newStatus) {
+            db.ref('slots/' + id).update({
+                status: newStatus,
+                user: currentUser
+            });
+        }
+
+        function renderUserSlots() {
+            const container = document.getElementById('user-slots-list');
+
+            if (cachedSlots.length === 0) {
+                container.innerHTML = `<p class="text-[#627d98] italic">Aucun créneau disponible pour le moment.</p>`;
+                return;
+            }
+
+            container.innerHTML = cachedSlots.map(slot => {
+                let actionButtons = '';
+
+                if (slot.status === 'libre') {
+                    actionButtons = `
+                        <div class="flex flex-wrap gap-2 mt-2 sm:mt-0">
+                            <button onclick="updateSlotStatus('${slot.id}', 'reserve')" class="bg-[#486581] hover:bg-[#334e68] text-white px-3 py-1.5 rounded-lg text-sm transition shadow-sm">Réserver</button>
+                            <button onclick="updateSlotStatus('${slot.id}', 'disponible_si_besoin')" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1.5 rounded-lg text-sm transition shadow-sm">Disponible si besoin</button>
+                        </div>
+                    `;
+                } else if (slot.status === 'disponible_si_besoin') {
+                    actionButtons = `
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center gap-2 mt-2 sm:mt-0">
+                            <span class="text-xs text-yellow-900 bg-yellow-100 px-2 py-1 rounded-md font-medium">Posé par : ${slot.user}</span>
+                            <button onclick="updateSlotStatus('${slot.id}', 'reserve')" class="bg-[#486581] hover:bg-[#334e68] text-white px-3 py-1.5 rounded-lg text-sm transition shadow-sm">Prendre le créneau</button>
+                        </div>
+                    `;
+                } else if (slot.status === 'reserve') {
+                    actionButtons = `<span class="text-sm font-semibold text-[#486581]">Réservé par ${slot.user}</span>`;
+                }
+
+                return `
+                    <div class="border border-[#bcccdc] p-4 rounded-xl flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 bg-[#f0f4f8]">
+                        <div>
+                            <span class="font-bold text-[#243b53]">${formatDate(slot.date)}</span> de <span class="text-[#486581] font-semibold">${slot.time}</span>
+                            <div class="text-sm mt-1">
+                                Statut : ${getStatusBadge(slot)}
+                            </div>
+                        </div>
+                        ${actionButtons}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function getStatusBadge(slot) {
+            if (slot.status === 'libre') return `<span class="bg-emerald-100 text-emerald-800 text-xs px-2.5 py-1 rounded-full font-medium">Libre</span>`;
+            if (slot.status === 'disponible_si_besoin') return `<span class="bg-yellow-100 text-yellow-800 text-xs px-2.5 py-1 rounded-full font-medium">Disponible si besoin (${slot.user})</span>`;
+            if (slot.status === 'reserve') return `<span class="bg-[#486581]/20 text-[#243b53] text-xs px-2.5 py-1 rounded-full font-medium">Réservé (${slot.user})</span>`;
+        }
+    </script>
+</body>
+</html>
