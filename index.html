@@ -49,7 +49,7 @@
                 <!-- Bloc Administrateur -->
                 <div class="border border-[#bcccdc] p-4 rounded-xl bg-[#f0f4f8]">
                     <h3 class="font-semibold mb-2 text-[#243b53]">Espace Administrateur</h3>
-                    <input type="password" id="admin-pass-input" placeholder="Mot de passe admin" class="w-full border border-[#bcccdc] rounded-lg px-3 py-2 mb-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#486581]">
+                    <input type="password" id="admin-pass-input" placeholder="Mot de passe admin" onkeydown="handleAdminKeydown(event)" class="w-full border border-[#bcccdc] rounded-lg px-3 py-2 mb-3 bg-white focus:outline-none focus:ring-2 focus:ring-[#486581]">
                     <button onclick="loginAsAdmin()" class="w-full bg-[#243b53] hover:bg-[#102a43] text-white font-medium py-2 rounded-lg transition shadow">Accéder en tant d'Admin</button>
                 </div>
             </div>
@@ -183,6 +183,13 @@
             }
         }
 
+        function handleAdminKeydown(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                loginAsAdmin();
+            }
+        }
+
         function loginAsAdmin() {
             const pass = document.getElementById('admin-pass-input').value;
             if (pass === ADMIN_CODE) {
@@ -237,7 +244,6 @@
 
         function selectAdminSlot(slotId) {
             if (adminSelectedSlotId === slotId) {
-                // Désélectionner si on re clique dessus
                 db.ref('settings/adminSelectedSlotId').remove();
             } else {
                 db.ref('settings/adminSelectedSlotId').set(slotId);
@@ -356,7 +362,6 @@
                     }).join(' ');
                 }
 
-                // Style conditionnel si c'est le créneau sélectionné par l'admin (cerclé de rouge)
                 const cardStyle = isSelectedByAdmin 
                     ? 'border-2 border-rose-500 bg-rose-50/60 shadow-sm ring-2 ring-rose-300' 
                     : 'border border-[#bcccdc] bg-[#f0f4f8]';
@@ -447,7 +452,6 @@
                     participantsHtml = `<div class="text-xs text-emerald-700 mt-1 font-medium">Libre (0/2)</div>`;
                 }
 
-                // Style conditionnel si c'est le créneau sélectionné par l'admin
                 const cardStyle = isSelectedByAdmin 
                     ? 'border-2 border-rose-500 bg-rose-50/60 shadow-sm ring-2 ring-rose-300' 
                     : 'border border-[#bcccdc] bg-[#f0f4f8]';
